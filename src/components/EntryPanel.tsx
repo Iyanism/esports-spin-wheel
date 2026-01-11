@@ -23,7 +23,7 @@ const EntryPanel: React.FC<EntryPanelProps> = ({ names, onAddNames, onRemoveName
 
   const handleAddBulk = () => {
     const list = bulkNames
-      .split(/[,\n\s]+/)
+      .split(/[,\n]+/)
       .map(name => name.trim())
       .filter(name => name !== '');
     if (list.length > 0) {
@@ -67,7 +67,7 @@ const EntryPanel: React.FC<EntryPanelProps> = ({ names, onAddNames, onRemoveName
             <textarea
               value={bulkNames}
               onChange={(e) => setBulkNames(e.target.value)}
-              placeholder="Paste names separated by commas, newlines, or spaces..."
+              placeholder="Paste names separated by commas or newlines (one name per line)..."
               className="w-full h-40 px-5 py-4 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-black/5 focus:border-black transition-all resize-none text-sm leading-relaxed"
             />
             <button
