@@ -7,7 +7,7 @@ import { Swords, RotateCcw } from 'lucide-react';
 
 const PREDEFINED_MATCHES = [
   { t1: "Hello Kitty Gang", t2: "VIP" },
-  { t1: "Define", t2: "ACE" }
+  { t1: "Define Aura", t2: "ACE" }
 ];
 
 function TeamSelectionMode() {
@@ -16,7 +16,6 @@ function TeamSelectionMode() {
   const [team2, setTeam2] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSpinning, setIsSpinning] = useState(false);
-  const [matchIndex, setMatchIndex] = useState(0);
 
   const handleAddNames = (newNames: string[]) => {
     setNames((prev: string[]) => [...prev, ...newNames]);
@@ -30,7 +29,6 @@ function TeamSelectionMode() {
     setNames([]);
     setTeam1(null);
     setTeam2(null);
-    setMatchIndex(0);
   };
 
   const handleWinner = (winner: string) => {
@@ -40,7 +38,6 @@ function TeamSelectionMode() {
     } else if (!team2) {
       setTeam2(winner);
       setNames((prev: string[]) => prev.filter(name => name !== winner));
-      setMatchIndex((prev: number) => prev + 1);
       setTimeout(() => setIsModalOpen(true), 1000);
     }
     setIsSpinning(false);
@@ -52,11 +49,27 @@ function TeamSelectionMode() {
     setTeam2(null);
   };
 
-  // Determine forced winner based on current state
-  const currentPredefined = PREDEFINED_MATCHES[matchIndex];
-  const forcedWinner = !team1 
-    ? (currentPredefined?.t1 && names.includes(currentPredefined.t1) ? currentPredefined.t1 : undefined)
-    : (currentPredefined?.t2 && names.includes(currentPredefined.t2) ? currentPredefined.t2 : undefined);
+  // Determine forced winner dynamically
+  // Search the matches list in order. The first match that has a presence in 'names' wins.
+  const getForcedWinner = () => {
+    if (!team1) {
+      // Picking Team 1: Look for the first t1 then t2 available across all predefined matches
+      for (const match of PREDEFINED_MATCHES) {
+        if (names.includes(match.t1)) return match.t1;
+        if (names.includes(match.t2)) return match.t2;
+      }
+    } else {
+      // Picking Team 2: See if Team 1 belongs to any match, and if its partner survives
+      const currentMatch = PREDEFINED_MATCHES.find(m => m.t1 === team1 || m.t2 === team1);
+      if (currentMatch) {
+        const partner = currentMatch.t1 === team1 ? currentMatch.t2 : currentMatch.t1;
+        if (names.includes(partner)) return partner;
+      }
+    }
+    return undefined;
+  };
+
+  const forcedWinner = getForcedWinner();
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col font-sans overflow-x-hidden">
