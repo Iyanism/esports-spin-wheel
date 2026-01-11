@@ -6,6 +6,7 @@ interface SpinWheelProps {
   size?: number;
   spinning?: boolean;
   forcedWinner?: string;
+  hideButton?: boolean;
 }
 
 const vibrantPalette = [
@@ -14,7 +15,7 @@ const vibrantPalette = [
   '#2ECC71', '#3498DB', '#E67E22', '#F1C40F'
 ];
 
-const SpinWheel: React.FC<SpinWheelProps> = ({ items, onWinner, size = 600, spinning: externalSpinning = false, forcedWinner }) => {
+const SpinWheel: React.FC<SpinWheelProps> = ({ items, onWinner, size = 600, spinning: externalSpinning = false, forcedWinner, hideButton }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isSpinning, setIsSpinning] = useState(false);
   const rotationRef = useRef(0);
@@ -199,8 +200,6 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ items, onWinner, size = 600, spin
   // Expose spin method or watch for prop
   useEffect(() => {
     if (externalSpinning && !isSpinning) {
-      // Use setTimeout to defer the call and avoid the "cascading renders" warning.
-      // This ensures the state update happens after the current render cycle.
       const timer = setTimeout(() => {
         spin();
       }, 0);
@@ -209,39 +208,30 @@ const SpinWheel: React.FC<SpinWheelProps> = ({ items, onWinner, size = 600, spin
   }, [externalSpinning, isSpinning, spin]);
 
   return (
-    <div className="relative flex flex-col items-center">
-      {/* Arrow Indicator - Triangle pointing down */}
-      <div className="absolute -top-6 z-20">
-        <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M20 38L2 4L38 4L20 38Z" fill="black" stroke="white" strokeWidth="3"/>
+    <div className="relative inline-block">
+      {/* Arrow Indicator */}
+      <div className="absolute top-[-25px] left-1/2 -translate-x-1/2 z-20 pointer-events-none drop-shadow-xl">
+        <svg width="50" height="50" viewBox="0 0 50 50" fill="none">
+          <path d="M25 45L5 5H45L25 45Z" fill="#ff4d4d" stroke="#ffffff" strokeWidth="4" strokeLinejoin="round"/>
         </svg>
       </div>
-      
+
       <canvas
         ref={canvasRef}
         width={size}
         height={size}
-        className="rounded-full shadow-[0_40px_80px_-15px_rgba(0,0,0,0.15)] bg-white transition-opacity duration-300"
-        style={{
-          width: size,
-          height: size,
-        }}
+        className="rounded-full shadow-[0_0_60px_rgba(0,0,0,0.15)] ring-8 ring-black/5"
       />
 
-      {!externalSpinning && (
-        <div className="mt-8">
-          <button
-            onClick={spin}
-            disabled={isSpinning || items.length === 0}
-            className={`
-              px-12 py-4 bg-black text-white rounded-full font-bold uppercase tracking-widest
-              hover:bg-gray-800 transition-all active:scale-95 disabled:bg-gray-300 disabled:cursor-not-allowed
-              shadow-xl hover:shadow-2xl
-            `}
-          >
-            {isSpinning ? 'Spinning...' : 'Spin'}
-          </button>
-        </div>
+      {/* Spin Button */}
+      {!externalSpinning && !hideButton && (
+        <button
+          onClick={spin}
+          disabled={isSpinning || items.length === 0}
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 bg-black text-white rounded-full font-black text-xs uppercase tracking-widest shadow-[0_0_30px_rgba(0,0,0,0.3)] hover:scale-105 active:scale-95 disabled:bg-gray-200 disabled:text-gray-400 z-10 border-4 border-white"
+        >
+          {isSpinning ? '...' : 'Spin'}
+        </button>
       )}
     </div>
   );

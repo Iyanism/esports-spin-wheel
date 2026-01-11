@@ -124,13 +124,14 @@ function TeamSelectionMode() {
             </div>
             
             <div className="scale-[0.8] md:scale-100 transition-transform duration-500">
-              <SpinWheel 
-                items={names} 
-                onWinner={handleWinner} 
-                size={500}
-                spinning={isSpinning}
-                forcedWinner={forcedWinner}
-              />
+                <SpinWheel 
+                  items={names} 
+                  onWinner={handleWinner} 
+                  size={500}
+                  spinning={isSpinning}
+                  forcedWinner={forcedWinner}
+                  hideButton={!!team1}
+                />
             </div>
 
             {team1 && !team2 && (
